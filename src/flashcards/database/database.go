@@ -34,10 +34,6 @@ func NewDatabase(engine EngineBuilder, opts ...EngineOpt) (Database, error) {
 	addr := os.Getenv("DATBASE_ADDR")
 	database := os.Getenv("DATABASE")
 
-	fmt.Println("USER: ", user)
-	fmt.Println("PASSWD: ", password)
-	fmt.Println("ADDR: ", addr)
-	fmt.Println("DATABASE: ", database)
 	dns := fmt.Sprintf(dnsPattern, user, password, addr, database)
 	e, err := engine(dns, opts...)
 	if err != nil {
