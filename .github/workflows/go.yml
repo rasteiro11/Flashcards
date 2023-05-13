@@ -14,15 +14,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Compose container
+      run: docker compose -f ./docker/docker-compose.yaml up -d
+
     - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
         go-version: 1.19
-
-    - name: Compose container
-      run: docker compose -f ./docker/docker-compose.yaml up -d
 
     - name: Build
       run: go build -v ./...
