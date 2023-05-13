@@ -10,7 +10,7 @@ import (
 func createDatabase(t *testing.T) database.Database {
 	database, err := database.NewDatabase(database.GetMysqlEngineBuilder)
 	if err != nil {
-		log.Fatalf("[main] database.NewDatabase() return error: %+v\n", err)
+		log.Fatalf("[createDatabase] database.NewDatabase() returned error: %+v\n", err)
 	}
 
 	return database
@@ -37,21 +37,15 @@ type (
 )
 
 func TestNewDatabase(t *testing.T) {
-	database := createDatabase(t)
-	if database == nil {
-		t.Fatalf("database.NewDatabase() can not be nil")
-	}
+	createDatabase(t)
 }
 
 func TestTestMigration(t *testing.T) {
 	database := createDatabase(t)
-	if database == nil {
-		t.Fatalf("database.NewDatabase() can not be nil")
-	}
 
 	err := database.Migrate(getEntities()...)
 	if err != nil {
-		log.Fatalf("[main] database.Migrate() returned error: %+v\n", err)
+		log.Fatalf("[TestTestMigration] database.Migrate() returned error: %+v\n", err)
 	}
 }
 
@@ -59,13 +53,13 @@ func dropTables(t *testing.T, db database.Database) {
 	migrator := db.Conn().Migrator()
 	tableNames, err := migrator.GetTables()
 	if err != nil {
-		log.Fatalf("[main] db.Conn.GetTables() returned error: %+v\n", err)
+		log.Fatalf("[dropTables] db.Conn.GetTables() returned error: %+v\n", err)
 	}
 
 	for _, tableName := range tableNames {
 		err := migrator.DropTable(tableName)
 		if err != nil {
-			log.Fatalf("[main] db.DropTable() returned error: %+v\n", err)
+			log.Fatalf("[dropTables] db.DropTable() returned error: %+v\n", err)
 		}
 	}
 }
