@@ -22,7 +22,7 @@ jobs:
         go-version: 1.19
 
     - name: Compose container
-      run: make compose
+      run: docker compose -f ./docker/docker-compose.yaml up -d
 
     - name: Build
       run: go build -v ./...
