@@ -27,6 +27,7 @@ jobs:
         go-version: 1.19
 
     - name: Set env variables
+      run: echo "Setting env variables"
       env:
         DATABASE: ${{ vars.DATABASE }}
         DATABASE_ADDR: ${{ vars.DATABASE_ADDR }}
