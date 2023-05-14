@@ -29,9 +29,9 @@ func (d *db) Migrate(entities ...any) error {
 }
 
 func NewDatabase(engine EngineBuilder, opts ...EngineOpt) (Database, error) {
-	user := os.Getenv("DATBASE_USER")
-	password := os.Getenv("DATBASE_PASSWORD")
-	addr := os.Getenv("DATBASE_ADDR")
+	user := os.Getenv("DATABASE_USER")
+	password := os.Getenv("DATABASE_PASSWORD")
+	addr := os.Getenv("DATABASE_ADDR")
 	database := os.Getenv("DATABASE")
 
 	fmt.Println("USER: ", user)
