@@ -21,3 +21,5 @@
 go.work
 
 docker/.database
+
+.env
