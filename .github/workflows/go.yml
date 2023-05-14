@@ -18,6 +18,11 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Set env variables
+      run: |
+        echo "database variable : $DATABASE"
+        echo "database_addr variable : $DATABASE_ADDR"
+        echo "database_password variable : $DATABASE_PASSWORD"
+        echo "databasee_user : $DATABASE_USER"
       env:
         DATABASE: ${{ vars.DATABASE }}
         DATABASE_ADDR: ${{ vars.DATABASE_ADDR }}
