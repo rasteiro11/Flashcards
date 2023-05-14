@@ -17,6 +17,15 @@ jobs:
 
     - uses: actions/checkout@v3
 
+
+    - name: Compose container
+      run: docker compose -f ./docker/docker-compose.yaml up -d
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
     - name: Set env variables
       run: |
         echo "database variable : $DATABASE"
@@ -28,14 +37,6 @@ jobs:
         DATABASE_ADDR: ${{ vars.DATABASE_ADDR }}
         DATABASE_PASSWORD: ${{ vars.DATABASE_PASSWORD }}
         DATABASE_USER: ${{ vars.DATABASE_USER }}
-
-    - name: Compose container
-      run: docker compose -f ./docker/docker-compose.yaml up -d
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
 
     - name: Build
       run: go build -v ./...
