@@ -26,16 +26,13 @@ jobs:
       with:
         go-version: 1.19
 
-    - name: Set env variables
-      run: echo "Setting env variables"
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
       env:
         DATABASE: ${{ vars.DATABASE }}
         DATABASE_ADDR: ${{ vars.DATABASE_ADDR }}
         DATABASE_PASSWORD: ${{ vars.DATABASE_PASSWORD }}
         DATABASE_USER: ${{ vars.DATABASE_USER }}
-
-    - name: Build
-      run: go build -v ./...
-
-    - name: Test
       run: go test ./...
