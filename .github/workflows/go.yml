@@ -42,4 +42,9 @@ jobs:
       run: go build -v ./...
 
     - name: Test
+      env:
+        DATABASE: ${{ vars.DATABASE }}
+        DATABASE_ADDR: ${{ vars.DATABASE_ADDR }}
+        DATABASE_PASSWORD: ${{ vars.DATABASE_PASSWORD }}
+        DATABASE_USER: ${{ vars.DATABASE_USER }}
       run: go test ./...
