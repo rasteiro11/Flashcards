@@ -1,10 +1,11 @@
 package database_test
 
 import (
-	"flashcards/src/flashcards/database"
-	"gorm.io/gorm"
+	"flashcards/core/database"
 	"log"
 	"testing"
+
+	"gorm.io/gorm"
 )
 
 func createDatabase(t *testing.T) database.Database {
