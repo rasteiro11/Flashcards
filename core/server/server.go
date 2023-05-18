@@ -17,24 +17,7 @@ type (
 		prefix string
 		routes map[string]route
 	}
-
-	Server interface {
-		AddHandler(
-			path, group, method string,
-			handler fiber.Handler,
-			middlewares ...fiber.Handler,
-		)
-		Use(group string, middlewares ...fiber.Handler)
-		Start(port string) error
-		PrintRouter()
-	}
 )
-
-func WithPrefix(prefix string) ServerOpt {
-	return func(s *server) {
-		s.prefix = prefix
-	}
-}
 
 func (s *server) Use(group string, middlewares ...fiber.Handler) {
 	fullPath := s.prefix + group
