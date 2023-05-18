@@ -1,7 +1,7 @@
 package server_test
 
 import (
-	"flashcards/src/flashcards/server"
+	"flashcards/core/server"
 	"fmt"
 	"net/http"
 	"testing"
