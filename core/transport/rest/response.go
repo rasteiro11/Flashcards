@@ -14,9 +14,8 @@ type (
 	}
 )
 
-func newResponse[T any](c *fiber.Ctx, data T, opts ...ResponseOpt[T]) *response[T] {
+func configureResponse[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) *response[T] {
 	res := &response[T]{
-		body:    data,
 		headers: make(http.Header),
 	}
 
@@ -29,29 +28,32 @@ func newResponse[T any](c *fiber.Ctx, data T, opts ...ResponseOpt[T]) *response[
 
 type ResponseOpt[T any] func(r *response[T])
 
-func WithBody[T any](body T) ResponseOpt[T] {
-	return func(res *response[T]) {
-		res.body = body
+func NewResponse[T any](c *fiber.Ctx, statusCode int, opts ...ResponseOpt[T]) *response[T] {
+	response := configureResponse(c, opts...)
+
+	if response.statusCode != 0 {
+		c.Response().SetStatusCode(response.statusCode)
 	}
+
+	return response
 }
 
-func WithStatusCode[T any](statusCode int) ResponseOpt[T] {
-	return func(res *response[T]) {
-		res.statusCode = statusCode
-	}
+func (res *response[T]) JSON(c *fiber.Ctx) error {
+	return c.JSON(res.body)
 }
 
-func WithHeader[T any](key, value string) ResponseOpt[T] {
-	return func(res *response[T]) {
-		res.headers.Add(key, value)
-	}
+func NewStatusOkResponse[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) error {
+	return NewResponse(c, http.StatusOK, opts...).JSON(c)
 }
 
-//func (r *response[T]) WithStatusCode(statusCode int) *response[T] {
-//	return r
-//}
+func NewStatusCreated[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) error {
+	return NewResponse(c, http.StatusCreated, opts...).JSON(c)
+}
 
-//func NewStatusOkResponse[T any](c *fiber.Ctx, data T) error {
-//	c.Response().SetStatusCode(http.StatusOK)
-//	return c.JSON(data)
-//}
+func NewStatusBadRequest(c *fiber.Ctx, err error) error {
+	return NewResponse(c, http.StatusBadRequest, WithBody(err)).JSON(c)
+}
+
+func NewStatusInternalServerError(c *fiber.Ctx, err error) error {
+	return NewResponse(c, http.StatusInternalServerError, WithBody(err)).JSON(c)
+}
