@@ -1,9 +1,9 @@
 package http
 
 import (
-	"errors"
 	"flashcards/core/server"
 	"flashcards/core/transport/rest"
+	"flashcards/models"
 	"flashcards/src/flashcards"
 	"net/http"
 
@@ -32,19 +32,20 @@ func NewHandler(server server.Server, opts ...HandlerOpt) {
 		opt(h)
 	}
 
-	server.AddHandler("/flashcards", UserGroupPath, http.MethodGet, h.List)
 	server.AddHandler("/flashcard", UserGroupPath, http.MethodPost, h.Create)
-	server.AddHandler("/flashcard", UserGroupPath, http.MethodPut, h.Update)
 }
 
 func (h *handler) Create(c *fiber.Ctx) error {
-	return rest.NewStatusCreated(c, rest.WithBody(fiber.Map{"Testing": "Status created reponse"}))
-}
+	req := &models.CreateCardRequest{}
 
-func (h *handler) List(c *fiber.Ctx) error {
-	return rest.NewStatusOkResponse(c, rest.WithBody(fiber.Map{"Testing": "Status ok reponse"}))
-}
+	if err := c.BodyParser(req); err != nil {
+		return rest.NewStatusBadRequest(c, err)
+	}
 
-func (h *handler) Update(c *fiber.Ctx) error {
-	return rest.NewStatusBadRequest(c, errors.New("Testing bad response"))
+	createdCard, err := h.usecase.Create(c.Context(), req)
+	if err != nil {
+		return rest.NewStatusInternalServerError(c, err)
+	}
+
+	return rest.NewStatusCreated(c, rest.WithBody(createdCard))
 }
