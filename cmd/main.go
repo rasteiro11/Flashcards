@@ -3,6 +3,7 @@ package main
 import (
 	"flashcards/core/database"
 	"flashcards/core/server"
+	"flashcards/models"
 	flashcardsHttp "flashcards/src/flashcards/delivery/http"
 	flashcardsRepo "flashcards/src/flashcards/repository"
 	flashcardsCase "flashcards/src/flashcards/usecase"
@@ -13,6 +14,10 @@ func main() {
 	database, err := database.NewDatabase(database.GetMysqlEngineBuilder)
 	if err != nil {
 		log.Fatalf("[main] database.NewDatabase() retunrned error: %+v\n", err)
+	}
+
+	if err := database.Migrate(models.GetEntities()...); err != nil {
+		log.Fatalf("[main] database.Migrate() retunrned error: %+v\n", err)
 	}
 
 	server := server.NewServer(server.WithPrefix("/flashcard"))
