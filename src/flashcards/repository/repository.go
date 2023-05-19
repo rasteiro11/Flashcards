@@ -31,3 +31,22 @@ func (r *repository) Create(ctx context.Context, card *models.Card) (*models.Car
 
 	return card, nil
 }
+
+func (r *repository) Delete(ctx context.Context, card *models.Card) (*models.Card, error) {
+	if err := r.db.Delete(card).Error; err != nil {
+		log.Printf("[flashcards.repository.Delete] db.Delete() returned error: %+v\n", err)
+		return nil, err
+	}
+
+	return card, nil
+}
+
+func (r *repository) FindOne(ctx context.Context, card *models.Card) (*models.Card, error) {
+	res := &models.Card{}
+	if err := r.db.Where(card).Take(res).Error; err != nil {
+		log.Printf("[flashcards.repository.FindOne] db.Take() returned error: %+v\n", err)
+		return nil, err
+	}
+
+	return res, nil
+}
