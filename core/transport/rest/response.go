@@ -14,9 +14,10 @@ type (
 	}
 )
 
-func configureResponse[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) *response[T] {
+func configureResponse[T any](c *fiber.Ctx, statusCode int, opts ...ResponseOpt[T]) *response[T] {
 	res := &response[T]{
-		headers: make(http.Header),
+		statusCode: statusCode,
+		headers:    make(http.Header),
 	}
 
 	for _, opt := range opts {
@@ -29,7 +30,7 @@ func configureResponse[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) *response[T]
 type ResponseOpt[T any] func(r *response[T])
 
 func NewResponse[T any](c *fiber.Ctx, statusCode int, opts ...ResponseOpt[T]) *response[T] {
-	response := configureResponse(c, opts...)
+	response := configureResponse(c, statusCode, opts...)
 
 	if response.statusCode != 0 {
 		c.Response().SetStatusCode(response.statusCode)
