@@ -43,7 +43,7 @@ func (res *response[T]) JSON(c *fiber.Ctx) error {
 	return c.JSON(res.body)
 }
 
-func NewStatusOkResponse[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) error {
+func NewStatusOk[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) error {
 	return NewResponse(c, http.StatusOK, opts...).JSON(c)
 }
 
@@ -52,9 +52,17 @@ func NewStatusCreated[T any](c *fiber.Ctx, opts ...ResponseOpt[T]) error {
 }
 
 func NewStatusBadRequest(c *fiber.Ctx, err error) error {
-	return NewResponse(c, http.StatusBadRequest, WithBody(err)).JSON(c)
+	return NewResponse(c, http.StatusBadRequest, WithBody(err.Error())).JSON(c)
 }
 
 func NewStatusInternalServerError(c *fiber.Ctx, err error) error {
-	return NewResponse(c, http.StatusInternalServerError, WithBody(err)).JSON(c)
+	return NewResponse(c, http.StatusInternalServerError, WithBody(err.Error())).JSON(c)
+}
+
+func NewStatusUnauthorized(c *fiber.Ctx, err error) error {
+	return NewResponse(c, http.StatusUnauthorized, WithBody(err.Error())).JSON(c)
+}
+
+func NewStatusNotFound(c *fiber.Ctx, err error) error {
+	return NewResponse(c, http.StatusNotFound, WithBody(err.Error())).JSON(c)
 }

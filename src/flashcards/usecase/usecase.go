@@ -45,39 +45,23 @@ func (u *usecase) Create(ctx context.Context, req *models.CreateCardRequest) (*m
 	}
 
 	return &models.CreateCardResponse{
-		Model:    createdCard.Model,
-		UserID:   createdCard.UserID,
-		WhichBox: createdCard.WhichBox,
-		Question: createdCard.Question,
-		Answer:   createdCard.Answer,
+		Card: createdCard,
 	}, nil
 }
 
 func (u *usecase) Delete(ctx context.Context, req *models.DeleteCardRequest) (*models.DeleteCardResponse, error) {
-	createdCard, err := u.repository.Delete(ctx, &models.Card{
-		Model:    req.Model,
-		UserID:   req.UserID,
-		WhichBox: req.WhichBox,
-		Question: req.Question,
-		Answer:   req.Answer,
-	})
+	deletedCard, err := u.repository.Delete(ctx, req.Card)
 	if err != nil {
 		return nil, err
 	}
 
 	return &models.DeleteCardResponse{
-		Model:    createdCard.Model,
-		UserID:   createdCard.UserID,
-		WhichBox: createdCard.WhichBox,
-		Question: createdCard.Question,
-		Answer:   createdCard.Answer,
+		Card: deletedCard,
 	}, nil
 }
 
 func (u *usecase) FindOne(ctx context.Context, req *models.GetCardRequest) (*models.GetCardResponse, error) {
-	createdCard, err := u.repository.FindOne(ctx, &models.Card{
-		Model: gorm.Model{ID: req.Id},
-	})
+	createdCard, err := u.repository.FindOne(ctx, req.Card)
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +69,45 @@ func (u *usecase) FindOne(ctx context.Context, req *models.GetCardRequest) (*mod
 	return &models.GetCardResponse{
 		Card: createdCard,
 	}, nil
+}
+
+func (u *usecase) List(ctx context.Context, req *models.ListCardsRequest) (*models.ListCardsPagesResponse, error) {
+	return u.repository.List(ctx, req)
+}
+
+func (u *usecase) Update(ctx context.Context, req *models.UpdateCardRequest) (*models.UpdateCardResponse, error) {
+	updatedCard, err := u.repository.Update(ctx, req.Card)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.UpdateCardResponse{Card: updatedCard}, nil
+}
+
+func (u *usecase) SwapCards(ctx context.Context, req *models.SwapCardsRequest) (*models.SwapCardsResponse, error) {
+	userCard, err := u.repository.FindOne(ctx,
+		&models.Card{
+			Model:  gorm.Model{ID: req.UserCardID},
+			UserID: req.UserID,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	otherUserCard, err := u.repository.FindOne(ctx,
+		&models.Card{
+			Model:  gorm.Model{ID: req.OtherUserCardID},
+			UserID: req.OtherUserID,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.repository.SwapCards(ctx, userCard, otherUserCard); err != nil {
+		return nil, err
+	}
+
+	return &models.SwapCardsResponse{}, nil
 }
