@@ -121,7 +121,12 @@ func (h *handler) FindOne(c *fiber.Ctx) error {
 	}
 
 	card, err := h.usecase.FindOne(c.Context(),
-		&models.GetCardRequest{Id: uint(numId), UserID: userInfo.UserID})
+		&models.GetCardRequest{
+			Card: &models.Card{
+				Model:  gorm.Model{ID: uint(numId)},
+				UserID: userInfo.UserID,
+			},
+		})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return rest.NewStatusNotFound(c, err)

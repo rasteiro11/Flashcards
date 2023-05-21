@@ -61,9 +61,7 @@ func (u *usecase) Delete(ctx context.Context, req *models.DeleteCardRequest) (*m
 }
 
 func (u *usecase) FindOne(ctx context.Context, req *models.GetCardRequest) (*models.GetCardResponse, error) {
-	createdCard, err := u.repository.FindOne(ctx, &models.Card{
-		Model: gorm.Model{ID: req.Id},
-	})
+	createdCard, err := u.repository.FindOne(ctx, req.Card)
 	if err != nil {
 		return nil, err
 	}
