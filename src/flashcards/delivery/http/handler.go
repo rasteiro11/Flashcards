@@ -6,16 +6,18 @@ import (
 	"flashcards/core/transport/rest"
 	"flashcards/models"
 	"flashcards/src/flashcards"
-	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 var UserGroupPath = "/user"
 
 var (
-	ErrPathParam = errors.New("path param is missing")
+	ErrPathParam     = errors.New("path param is missing")
+	ErrTypeAssertion = errors.New("type assertion error")
 )
 
 type (
@@ -51,9 +53,16 @@ var _ flashcards.Handler = (*handler)(nil)
 func (h *handler) Create(c *fiber.Ctx) error {
 	req := &models.CreateCardRequest{}
 
+	userInfo, ok := c.Context().UserValue("user").(*models.Claims)
+	if !ok {
+		return rest.NewStatusBadRequest(c, ErrTypeAssertion)
+	}
+
 	if err := c.BodyParser(req); err != nil {
 		return rest.NewStatusBadRequest(c, err)
 	}
+
+	req.UserID = userInfo.UserID
 
 	createdCard, err := h.usecase.Create(c.Context(), req)
 	if err != nil {
@@ -74,8 +83,17 @@ func (h *handler) Delete(c *fiber.Ctx) error {
 		return rest.NewStatusBadRequest(c, err)
 	}
 
+	userInfo, ok := c.Context().UserValue("user").(*models.Claims)
+	if !ok {
+		return rest.NewStatusBadRequest(c, ErrTypeAssertion)
+	}
+
 	deletedCard, err := h.usecase.Delete(c.Context(),
-		&models.DeleteCardRequest{Card: &models.Card{Model: gorm.Model{ID: uint(numId)}}})
+		&models.DeleteCardRequest{
+			Card: &models.Card{
+				Model:  gorm.Model{ID: uint(numId)},
+				UserID: userInfo.UserID,
+			}})
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return rest.NewStatusInternalServerError(c, err)
@@ -92,13 +110,18 @@ func (h *handler) FindOne(c *fiber.Ctx) error {
 		return rest.NewStatusBadRequest(c, ErrPathParam)
 	}
 
+	userInfo, ok := c.Context().UserValue("user").(*models.Claims)
+	if !ok {
+		return rest.NewStatusBadRequest(c, ErrTypeAssertion)
+	}
+
 	numId, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		return rest.NewStatusBadRequest(c, err)
 	}
 
 	card, err := h.usecase.FindOne(c.Context(),
-		&models.GetCardRequest{Id: uint(numId)})
+		&models.GetCardRequest{Id: uint(numId), UserID: userInfo.UserID})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return rest.NewStatusNotFound(c, err)
@@ -114,9 +137,16 @@ func (h *handler) List(c *fiber.Ctx) error {
 		Query: &models.ListCardsPagesQuery{},
 	}
 
+	userInfo, ok := c.Context().UserValue("user").(*models.Claims)
+	if !ok {
+		return rest.NewStatusBadRequest(c, ErrTypeAssertion)
+	}
+
 	if err := c.BodyParser(req); err != nil {
 		return rest.NewStatusBadRequest(c, err)
 	}
+
+	req.Query.UserID = userInfo.UserID
 
 	cards, err := h.usecase.List(c.Context(), req)
 	if err != nil {
@@ -131,9 +161,16 @@ func (h *handler) Update(c *fiber.Ctx) error {
 		Card: &models.Card{},
 	}
 
+	userInfo, ok := c.Context().UserValue("user").(*models.Claims)
+	if !ok {
+		return rest.NewStatusBadRequest(c, ErrTypeAssertion)
+	}
+
 	if err := c.BodyParser(req.Card); err != nil {
 		return rest.NewStatusBadRequest(c, err)
 	}
+
+	req.UserID = userInfo.UserID
 
 	updatedCard, err := h.usecase.Update(c.Context(), req)
 	if err != nil {
@@ -146,9 +183,16 @@ func (h *handler) Update(c *fiber.Ctx) error {
 func (h *handler) SwapCards(c *fiber.Ctx) error {
 	req := &models.SwapCardsRequest{}
 
+	userInfo, ok := c.Context().UserValue("user").(*models.Claims)
+	if !ok {
+		return rest.NewStatusBadRequest(c, ErrTypeAssertion)
+	}
+
 	if err := c.BodyParser(req); err != nil {
 		return rest.NewStatusBadRequest(c, err)
 	}
+
+	req.UserID = userInfo.UserID
 
 	result, err := h.usecase.SwapCards(c.Context(), req)
 	if err != nil {

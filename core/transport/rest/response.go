@@ -59,6 +59,10 @@ func NewStatusInternalServerError(c *fiber.Ctx, err error) error {
 	return NewResponse(c, http.StatusInternalServerError, WithBody(err.Error())).JSON(c)
 }
 
+func NewStatusUnauthorized(c *fiber.Ctx, err error) error {
+	return NewResponse(c, http.StatusUnauthorized, WithBody(err.Error())).JSON(c)
+}
+
 func NewStatusNotFound(c *fiber.Ctx, err error) error {
 	return NewResponse(c, http.StatusNotFound, WithBody(err.Error())).JSON(c)
 }

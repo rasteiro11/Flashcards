@@ -32,7 +32,8 @@ type DeleteCardResponse struct {
 }
 
 type GetCardRequest struct {
-	Id uint
+	Id     uint
+	UserID uint
 }
 
 type GetCardResponse struct {

@@ -3,10 +3,14 @@ package main
 import (
 	"flashcards/core/database"
 	"flashcards/core/server"
+	middlewares "flashcards/middleware"
 	"flashcards/models"
 	flashcardsHttp "flashcards/src/flashcards/delivery/http"
 	flashcardsRepo "flashcards/src/flashcards/repository"
 	flashcardsCase "flashcards/src/flashcards/usecase"
+	usersHttp "flashcards/src/user/delivery/http"
+	usersRepo "flashcards/src/user/repository"
+	usersCase "flashcards/src/user/usecase"
 	"log"
 )
 
@@ -21,16 +25,22 @@ func main() {
 	}
 
 	server := server.NewServer(server.WithPrefix("/flashcard"))
+	server.Use("/user", middlewares.ValidateUserMiddleware())
 
 	db := database.Conn()
 
-	flashcardsRepo := flashcardsRepo.NewRepository(db)
+	cardsRepo := flashcardsRepo.NewRepository(db)
+	usersRepo := usersRepo.NewRepository(db)
 
 	flashcardsUsecase := flashcardsCase.NewUsecase(
-		flashcardsCase.WithRepository(flashcardsRepo),
+		flashcardsCase.WithRepository(cardsRepo),
+	)
+	usersUsecase := usersCase.NewUsecase(
+		usersCase.WithRepository(usersRepo),
 	)
 
 	flashcardsHttp.NewHandler(server, flashcardsHttp.WithUsecase(flashcardsUsecase))
+	usersHttp.NewHandler(server, usersHttp.WithUsecase(usersUsecase))
 
 	server.PrintRouter()
 
