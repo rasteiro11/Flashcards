@@ -1,8 +1,10 @@
 package server
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"log"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type (
@@ -63,6 +65,13 @@ func NewServer(opts ...ServerOpt) Server {
 	}
 
 	s.engine = fiber.New()
+
+	s.engine.Use(cors.New(cors.Config{
+		AllowHeaders:     "*",
+		AllowOrigins:     "*",
+		AllowCredentials: true,
+		AllowMethods:     "*",
+	}))
 
 	for _, opt := range opts {
 		opt(s)
