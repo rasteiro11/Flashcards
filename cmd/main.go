@@ -11,6 +11,7 @@ import (
 	usersHttp "flashcards/src/user/delivery/http"
 	usersRepo "flashcards/src/user/repository"
 	usersCase "flashcards/src/user/usecase"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"
 )
 
@@ -26,6 +27,10 @@ func main() {
 
 	server := server.NewServer(server.WithPrefix("/flashcard"))
 	server.Use("/user", middlewares.ValidateUserMiddleware())
+	server.Use("/*", cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowHeaders: "*",
+	}))
 
 	db := database.Conn()
 
